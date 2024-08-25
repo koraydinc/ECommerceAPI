@@ -1,0 +1,1 @@
+This project is an e-commerce application developed using Onion Architecture. Onion Architecture aims to create a more sustainable and testable structure by minimizing dependencies in the software development process. This architecture clearly separates the layers of business logic and application infrastructure, enhancing code maintainability and extensibility.
