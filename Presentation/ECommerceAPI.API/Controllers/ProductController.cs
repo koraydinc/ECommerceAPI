@@ -19,13 +19,15 @@ namespace ECommerceAPI.API.Controllers
         }
 
         [HttpGet]
-        public async Task Added()
+        public async Task<IActionResult> GetAll()
         {
-            await _productWriteRepository.AddRangeAsync(new()
-            {
-                new Domain.Entities.Product() {Id = Guid.NewGuid(), Name = "Product-3", Price = 100, Stock = 10}
-            });
-            await _productWriteRepository.SaveAsync();
+            IQueryable<Product> products = _productReadRepository.GetAll();
+            return Ok(products);
+            //await _productWriteRepository.AddRangeAsync(new()
+            //{
+            //    new Domain.Entities.Product() {Id = Guid.NewGuid(), Name = "Product-3", Price = 100, Stock = 10}
+            //});
+            //await _productWriteRepository.SaveAsync();
         }
 
         [HttpGet("{id}")]
