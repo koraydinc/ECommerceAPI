@@ -12,7 +12,7 @@ namespace ECommerceAPI.Application.Validators.Products
                 .NotNull()
                     .WithMessage("Lütfen ürün adını boş geçmeyiniz!")
                 .Length(2, 150)
-                    .WithMessage("Ürün adını 2 ile 150 karakter arasında olmalıdır!");
+                    .WithMessage("Ürün adı 2 ile 150 karakter arasında olmalıdır!");
             RuleFor(p => p.Stock)
                 .NotEmpty()
                 .NotNull()
