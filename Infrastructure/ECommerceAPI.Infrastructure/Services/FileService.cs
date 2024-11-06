@@ -1,4 +1,5 @@
 ﻿using ECommerceAPI.Application.Services;
+using ECommerceAPI.Infrastructure.Operations;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 
@@ -11,6 +12,28 @@ namespace ECommerceAPI.Infrastructure.Services
         public FileService(IWebHostEnvironment webHostEnvironment)
         {
             _webHostEnvironment = webHostEnvironment;
+        }
+
+        private async Task<string> FileRenameAsync(string path, string fileName)
+        {
+            string extension = Path.GetExtension(fileName);
+
+            string oldName = Path.GetFileNameWithoutExtension(fileName);            
+
+            string regulatedFileName = NameOperation.CharacterRegulatory(oldName);
+
+            string date = DateTime.Now.ToString("yyyyMMddHHmmss");
+
+            string newFileName = $"{regulatedFileName}-{date}{extension}";
+
+            if (File.Exists($"{path}\\{newFileName}"))
+            {
+                return await FileRenameAsync(path, newFileName);
+            }
+            else
+            {
+                return newFileName;
+            }
         }
 
         public async Task<bool> CopyFileAsync(string path, IFormFile file)
@@ -31,11 +54,6 @@ namespace ECommerceAPI.Infrastructure.Services
 
         }
 
-        public async Task<string> FileRenameAsync(string fileName)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<List<(string fileName, string path)>> UploadAsync(string path, IFormFileCollection formFiles)
         {
             string uploadPath = Path.Combine(_webHostEnvironment.WebRootPath, path);
@@ -51,7 +69,7 @@ namespace ECommerceAPI.Infrastructure.Services
 
             foreach (IFormFile file in formFiles)
             {
-                string fileNewName = await FileRenameAsync(file.FileName);
+                string fileNewName = await FileRenameAsync(uploadPath, file.FileName);
 
                 bool result = await CopyFileAsync($"{uploadPath}\\{fileNewName}", file);
                 values.Add((fileNewName, $"{uploadPath}\\{fileNewName}"));
