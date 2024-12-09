@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ECommerceAPI.Infrastructure.Services.Storage.Azure
 {
-    public class AzureStorage : IAzureStorage
+    public class AzureStorage : Storage, IAzureStorage
     {
         private readonly BlobServiceClient _blobServiceClient;
         private BlobContainerClient _blobContainerClient;
@@ -51,7 +51,8 @@ namespace ECommerceAPI.Infrastructure.Services.Storage.Azure
 
             foreach (var file in files)
             {
-                BlobClient blobClient = _blobContainerClient.GetBlobClient(file.Name);
+                string newFileName = await FileRenameAsync(containerName, file.Name, HasFile);
+                BlobClient blobClient = _blobContainerClient.GetBlobClient(newFileName);
                 await blobClient.UploadAsync(file.OpenReadStream());
                 datas.Add((file.Name, containerName));
             }
