@@ -62,7 +62,7 @@ namespace ECommerceAPI.Infrastructure.Services.Storage.Local
                 Directory.CreateDirectory(uploadPath);
             }
 
-            List<(string fileName, string path)> values = new List<(string fileName, string path)>();
+            List<(string fileName, string path)> datas = new List<(string fileName, string path)>();
 
             //List<bool> results = new List<bool>();
 
@@ -71,16 +71,16 @@ namespace ECommerceAPI.Infrastructure.Services.Storage.Local
                 //string fileNewName = await FileRenameAsync(uploadPath, file.FileName);
 
                 await CopyFileAsync($"{uploadPath}\\{file.Name}", file);
-                values.Add((file.Name, $"{path}\\{file.Name}"));
+                datas.Add((file.Name, $"{path}\\{file.Name}"));
                 //results.Add(result);
             }
 
             //if (results.TrueForAll(r => r.Equals(true)))
             //{
-            //    return values;
+            //    return datas;
             //}
 
-            return values;
+            return datas;
             //todo Eğer ki yukarıdaki if geçerli değilse burda dosyaların sisteme işlenmesi noktasında hata alındığını client'e bildir!
         }
     }
