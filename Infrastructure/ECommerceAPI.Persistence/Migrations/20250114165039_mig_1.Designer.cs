@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ECommerceAPI.Persistence.Migrations
 {
     [DbContext(typeof(ECommerceAPIDbContext))]
-    [Migration("20240826200003_mig_1")]
+    [Migration("20250114165039_mig_1")]
     partial class mig_1
     {
         /// <inheritdoc />
@@ -31,16 +31,54 @@ namespace ECommerceAPI.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreateDate")
+                    b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.HasKey("Id");
 
                     b.ToTable("Customers");
+                });
+
+            modelBuilder.Entity("ECommerceAPI.Domain.Entities.File", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(21)
+                        .HasColumnType("character varying(21)");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Storage")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Files");
+
+                    b.HasDiscriminator().HasValue("File");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("ECommerceAPI.Domain.Entities.Order", b =>
@@ -53,7 +91,7 @@ namespace ECommerceAPI.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("CreateDate")
+                    b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("CustomerId")
@@ -62,6 +100,9 @@ namespace ECommerceAPI.Persistence.Migrations
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -76,18 +117,21 @@ namespace ECommerceAPI.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreateDate")
+                    b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<long>("Price")
-                        .HasColumnType("bigint");
+                    b.Property<float>("Price")
+                        .HasColumnType("real");
 
                     b.Property<int>("Stock")
                         .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -109,6 +153,42 @@ namespace ECommerceAPI.Persistence.Migrations
                     b.ToTable("OrderProduct");
                 });
 
+            modelBuilder.Entity("ProductProductImageFile", b =>
+                {
+                    b.Property<Guid>("ProductImageFilesId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ProductsId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("ProductImageFilesId", "ProductsId");
+
+                    b.HasIndex("ProductsId");
+
+                    b.ToTable("ProductProductImageFile");
+                });
+
+            modelBuilder.Entity("ECommerceAPI.Domain.Entities.InvoiceFile", b =>
+                {
+                    b.HasBaseType("ECommerceAPI.Domain.Entities.File");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric");
+
+                    b.HasDiscriminator().HasValue("InvoiceFile");
+                });
+
+            modelBuilder.Entity("ECommerceAPI.Domain.Entities.ProductImageFile", b =>
+                {
+                    b.HasBaseType("ECommerceAPI.Domain.Entities.File");
+
+                    b.Property<string>("ImageType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasDiscriminator().HasValue("ProductImageFile");
+                });
+
             modelBuilder.Entity("ECommerceAPI.Domain.Entities.Order", b =>
                 {
                     b.HasOne("ECommerceAPI.Domain.Entities.Customer", "Customer")
@@ -125,6 +205,21 @@ namespace ECommerceAPI.Persistence.Migrations
                     b.HasOne("ECommerceAPI.Domain.Entities.Order", null)
                         .WithMany()
                         .HasForeignKey("OrdersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ECommerceAPI.Domain.Entities.Product", null)
+                        .WithMany()
+                        .HasForeignKey("ProductsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ProductProductImageFile", b =>
+                {
+                    b.HasOne("ECommerceAPI.Domain.Entities.ProductImageFile", null)
+                        .WithMany()
+                        .HasForeignKey("ProductImageFilesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

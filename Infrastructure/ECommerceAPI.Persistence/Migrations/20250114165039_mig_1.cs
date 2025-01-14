@@ -17,11 +17,30 @@ namespace ECommerceAPI.Persistence.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    CreateDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Customers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Files",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    FileName = table.Column<string>(type: "text", nullable: false),
+                    Path = table.Column<string>(type: "text", nullable: false),
+                    Storage = table.Column<string>(type: "text", nullable: false),
+                    Discriminator = table.Column<string>(type: "character varying(21)", maxLength: 21, nullable: false),
+                    Price = table.Column<decimal>(type: "numeric", nullable: true),
+                    ImageType = table.Column<string>(type: "text", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Files", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -31,8 +50,9 @@ namespace ECommerceAPI.Persistence.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Stock = table.Column<int>(type: "integer", nullable: false),
-                    Price = table.Column<long>(type: "bigint", nullable: false),
-                    CreateDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    Price = table.Column<float>(type: "real", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -47,7 +67,8 @@ namespace ECommerceAPI.Persistence.Migrations
                     Description = table.Column<string>(type: "text", nullable: false),
                     Address = table.Column<string>(type: "text", nullable: false),
                     CustomerId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreateDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -56,6 +77,30 @@ namespace ECommerceAPI.Persistence.Migrations
                         name: "FK_Orders_Customers_CustomerId",
                         column: x => x.CustomerId,
                         principalTable: "Customers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProductProductImageFile",
+                columns: table => new
+                {
+                    ProductImageFilesId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ProductsId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductProductImageFile", x => new { x.ProductImageFilesId, x.ProductsId });
+                    table.ForeignKey(
+                        name: "FK_ProductProductImageFile_Files_ProductImageFilesId",
+                        column: x => x.ProductImageFilesId,
+                        principalTable: "Files",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ProductProductImageFile_Products_ProductsId",
+                        column: x => x.ProductsId,
+                        principalTable: "Products",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -93,6 +138,11 @@ namespace ECommerceAPI.Persistence.Migrations
                 name: "IX_Orders_CustomerId",
                 table: "Orders",
                 column: "CustomerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductProductImageFile_ProductsId",
+                table: "ProductProductImageFile",
+                column: "ProductsId");
         }
 
         /// <inheritdoc />
@@ -102,7 +152,13 @@ namespace ECommerceAPI.Persistence.Migrations
                 name: "OrderProduct");
 
             migrationBuilder.DropTable(
+                name: "ProductProductImageFile");
+
+            migrationBuilder.DropTable(
                 name: "Orders");
+
+            migrationBuilder.DropTable(
+                name: "Files");
 
             migrationBuilder.DropTable(
                 name: "Products");
