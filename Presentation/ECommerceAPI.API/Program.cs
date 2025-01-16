@@ -5,6 +5,7 @@ using ECommerceAPI.Infrastructure.Filters;
 using ECommerceAPI.Infrastructure.Services.Storage.Azure;
 using ECommerceAPI.Infrastructure.Services.Storage.Local;
 using ECommerceAPI.Persistence;
+using FluentValidation;
 using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,11 +19,17 @@ builder.Services.AddApplicationServices();
 //builder.Services.AddStorage<LocalStorage>();
 builder.Services.AddStorage<AzureStorage>();
 
+//CORS
 builder.Services.AddCors(options => options.AddDefaultPolicy(policy => policy.WithOrigins("http://localhost:4200", "https://localhost:4200").AllowAnyHeader().AllowAnyMethod()));
 
+//Fluent Validation
 builder.Services.AddControllers(options => options.Filters.Add<ValidationFilter>())
-    .AddFluentValidation(configuration => configuration.RegisterValidatorsFromAssemblyContaining<CreateProductValidator>())
     .ConfigureApiBehaviorOptions(options => options.SuppressModelStateInvalidFilter = true);
+
+builder.Services.AddFluentValidationAutoValidation()
+    .AddFluentValidationClientsideAdapters();
+
+builder.Services.AddValidatorsFromAssemblyContaining<CreateProductValidator>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
