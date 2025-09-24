@@ -27,23 +27,24 @@ namespace ECommerceAPI.Application.Features.Commands.AppUser.CreateUser
 
             CreateUserCommandResponse response = new CreateUserCommandResponse();
 
-
             if (result.Succeeded)
             {
                 response.Succeeded = true;
-                response.Message = "Kullanıcı başarıyla oluşturulmuştur.";               
+                response.Message = "Kullanıcı başarıyla oluşturulmuştur.";
             }
             else
             {
                 foreach (var error in result.Errors)
                 {
+                    if (error.Code == "DuplicateUserName")
+                        throw new UsernameAlreadyInUseException();
+                    if (error.Code == "DuplicateEmail")
+                        throw new EmailAlreadyInUseException();
                     response.Message += $"{error.Code} - {error.Description}";
                 }
             }
 
             return response;
-
-            //throw new UserCreateFailedException();
         }
     }
 }

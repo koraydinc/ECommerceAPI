@@ -34,8 +34,12 @@ namespace ECommerceAPI.Application.Features.Commands.AppUser.LoginUser
             {
                 //Yetkiler belirlenecek.
             }
+            else
+            {
+                throw new NotFoundUserException("Kullanıcı şifresi hatalı!");
+            }
 
-            return new LoginUserCommandResponse();
+                return new LoginUserCommandResponse();
         }
     }
 }
