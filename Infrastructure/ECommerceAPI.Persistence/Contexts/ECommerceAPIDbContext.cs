@@ -38,6 +38,7 @@ namespace ECommerceAPI.Persistence.Contexts
                         break;
                     case EntityState.Added:
                         data.Entity.CreatedDate = DateTime.UtcNow;
+                        data.Entity.UpdatedDate = DateTime.UtcNow;
                         break;
                 }
             }
